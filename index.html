@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#120c12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Semana Santa Countdown</title>
+  <style>
+    :root {
+      --gold: #d4af37;
+      --gold-soft: #f1d98a;
+      --text: #f7f1e6;
+      --muted: #ddd2ba;
+      --border: rgba(212, 175, 55, 0.22);
+      --shadow: 0 18px 50px rgba(0,0,0,0.45);
+      --card-bg: rgba(14, 9, 13, 0.88);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(212,175,55,0.10), transparent 28%),
+        linear-gradient(180deg, #2a1823, #1a1020 45%, #09070a);
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)) 18px;
+      overflow-x: hidden;
+    }
+
+    .app {
+      width: min(100%, 460px);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 760px;
+      background-image:
+        linear-gradient(180deg, rgba(8,6,10,0.08), rgba(8,6,10,0.14) 28%, rgba(8,6,10,0.28) 55%, rgba(8,6,10,0.62) 78%, rgba(8,6,10,0.86)),
+        url("hero.jpg");
+      background-size: cover;
+      background-position: center center;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 26%, rgba(214,141,44,0.14), transparent 18%),
+        linear-gradient(180deg, rgba(8,6,10,0.00), rgba(8,6,10,0.10) 35%, rgba(8,6,10,0.36) 62%, rgba(8,6,10,0.70));
+      pointer-events: none;
+    }
+
+    .overlay {
+      position: relative;
+      z-index: 1;
+      min-height: 760px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 18px 18px;
+    }
+
+    .top-copy {
+      text-align: center;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.55);
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.72rem;
+      color: var(--gold-soft);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 8vw, 3.2rem);
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: #f0e3c4;
+      font-size: 1rem;
+    }
+
+    .bottom-panel {
+      background: linear-gradient(180deg, rgba(10,8,12,0.18), rgba(10,8,12,0.44));
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(212,175,55,0.12);
+      border-radius: 24px;
+      padding: 16px;
+    }
+
+    .target-line {
+      text-align: center;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 14px;
+      font-size: 0.98rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.45);
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .time-box {
+      background: linear-gradient(180deg, rgba(35,18,22,0.62), rgba(18,10,15,0.62));
+      border: 1px solid rgba(212,175,55,0.20);
+      border-radius: 18px;
+      padding: 16px 8px 14px;
+      text-align: center;
+      min-height: 94px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .time-value {
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+      line-height: 1;
+      font-weight: 800;
+      color: var(--gold-soft);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+    }
+
+    .time-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .item {
+      background: linear-gradient(180deg, rgba(28,16,22,0.56), rgba(18,10,15,0.56));
+      border: 1px solid rgba(212,175,55,0.16);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+
+    .item-title {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .item-value {
+      font-size: 1rem;
+      font-weight: 650;
+    }
+
+    .actions, .audio-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 13px 16px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .primary {
+      background: linear-gradient(180deg, #e2c563, #c89d22);
+      color: #241708;
+    }
+
+    .secondary, .audio-btn {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid rgba(212,175,55,0.16);
+    }
+
+    .hint, .audio-note {
+      margin-top: 14px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 420px) {
+      .hero, .overlay { min-height: 720px; }
+    }
+
+    @media (max-width: 380px) {
+      .countdown-grid { gap: 8px; }
+      .time-box { min-height: 86px; padding: 14px 6px 12px; }
+      .time-label { font-size: 0.64rem; }
+      .hero, .overlay { min-height: 680px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="overlay">
+        <div class="top-copy">
+          <div class="eyebrow">Cuenta atrás</div>
+          <h1>Semana Santa</h1>
+          <p class="subtitle">Hasta el próximo Domingo de Ramos</p>
+        </div>
+
+        <div class="bottom-panel">
+          <div class="target-line" id="targetDate">—</div>
+
+          <section class="countdown-grid" aria-label="Cuenta atrás">
+            <div class="time-box"><div class="time-value" id="days">00</div><div class="time-label">Días</div></div>
+            <div class="time-box"><div class="time-value" id="hours">00</div><div class="time-label">Horas</div></div>
+            <div class="time-box"><div class="time-value" id="minutes">00</div><div class="time-label">Min</div></div>
+            <div class="time-box"><div class="time-value" id="seconds">00</div><div class="time-label">Seg</div></div>
+          </section>
+
+          <section class="grid">
+            <div class="item"><div class="item-title">Año</div><div class="item-value" id="yearValue">—</div></div>
+            <div class="item"><div class="item-title">Domingo de Ramos</div><div class="item-value" id="palmSunday">—</div></div>
+            <div class="item"><div class="item-title">Jueves Santo</div><div class="item-value" id="holyThursday">—</div></div>
+            <div class="item"><div class="item-title">Viernes Santo</div><div class="item-value" id="goodFriday">—</div></div>
+            <div class="item"><div class="item-title">Domingo de Resurrección</div><div class="item-value" id="easterSunday">—</div></div>
+          </section>
+
+          <div class="audio-controls">
+            <button class="audio-btn" id="playBtn" type="button">▶ Música</button>
+            <button class="audio-btn" id="muteBtn" type="button">🔇 Mute</button>
+          </div>
+          <div class="audio-note" id="audioNote">La música intentará empezar en el segundo 14.</div>
+
+          <div class="actions">
+            <button class="primary" id="refreshBtn" type="button">Actualizar</button>
+            <button class="secondary" id="copyBtn" type="button">Copiar fechas</button>
+          </div>
+
+          <p class="hint">Para GitHub Pages: usa index.html + hero.jpg + music.mp3 + .nojekyll.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <audio id="bgMusic" preload="auto" playsinline loop>
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    (function () {
+      function easterSunday(year) {
+        const a = year % 19;
+        const b = Math.floor(year / 100);
+        const c = year % 100;
+        const d = Math.floor(b / 4);
+        const e = b % 4;
+        const f = Math.floor((b + 8) / 25);
+        const g = Math.floor((b - f + 1) / 3);
+        const h = (19 * a + b - d - g + 15) % 30;
+        const i = Math.floor(c / 4);
+        const k = c % 4;
+        const l = (32 + 2 * e + 2 * i - h - k) % 7;
+        const m = Math.floor((a + 11 * h + 22 * l) / 451);
+        const month = Math.floor((h + l - 7 * m + 114) / 31);
+        const day = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(year, month - 1, day, 0, 0, 0, 0);
+      }
+
+      function addDays(date, days) {
+        const d = new Date(date.getTime());
+        d.setDate(d.getDate() + days);
+        return d;
+      }
+
+      function startOfDay(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+      }
+
+      function endOfDay(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+      }
+
+      function pad(value) {
+        return String(value).padStart(2, '0');
+      }
+
+      function diffClock(from, to) {
+        let delta = Math.max(0, to.getTime() - from.getTime());
+        const days = Math.floor(delta / 86400000);
+        delta -= days * 86400000;
+        const hours = Math.floor(delta / 3600000);
+        delta -= hours * 3600000;
+        const minutes = Math.floor(delta / 60000);
+        delta -= minutes * 60000;
+        const seconds = Math.floor(delta / 1000);
+        return { days, hours, minutes, seconds };
+      }
+
+      function getSemanaSanta(year) {
+        const easter = easterSunday(year);
+        return {
+          year: year,
+          easterSunday: easter,
+          palmSunday: addDays(easter, -7),
+          holyThursday: addDays(easter, -3),
+          goodFriday: addDays(easter, -2)
+        };
+      }
+
+      function getActiveSemanaSanta(now) {
+        const currentYear = now.getFullYear();
+        const thisYear = getSemanaSanta(currentYear);
+        if (now <= endOfDay(thisYear.easterSunday)) return thisYear;
+        return getSemanaSanta(currentYear + 1);
+      }
+
+      const esLong = new Intl.DateTimeFormat('es-ES', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
+
+      const esMedium = new Intl.DateTimeFormat('es-ES', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+
+      function render() {
+        const now = new Date();
+        const data = getActiveSemanaSanta(now);
+        const target = startOfDay(data.palmSunday);
+        const clock = diffClock(now, target);
+
+        document.getElementById('targetDate').textContent = 'Objetivo: ' + esLong.format(data.palmSunday);
+        document.getElementById('days').textContent = String(clock.days);
+        document.getElementById('hours').textContent = pad(clock.hours);
+        document.getElementById('minutes').textContent = pad(clock.minutes);
+        document.getElementById('seconds').textContent = pad(clock.seconds);
+        document.getElementById('yearValue').textContent = String(data.year);
+        document.getElementById('palmSunday').textContent = esMedium.format(data.palmSunday);
+        document.getElementById('holyThursday').textContent = esMedium.format(data.holyThursday);
+        document.getElementById('goodFriday').textContent = esMedium.format(data.goodFriday);
+        document.getElementById('easterSunday').textContent = esMedium.format(data.easterSunday);
+        return data;
+      }
+
+      const audio = document.getElementById('bgMusic');
+      const muteBtn = document.getElementById('muteBtn');
+      const playBtn = document.getElementById('playBtn');
+      const audioNote = document.getElementById('audioNote');
+      let audioStarted = false;
+
+      function setMuteLabel() {
+        muteBtn.textContent = audio.muted ? '🔊 Activar sonido' : '🔇 Mute';
+      }
+
+      function setPlayLabel() {
+        playBtn.textContent = (!audio.paused && !audio.ended) ? '⏸ Pausar' : '▶ Música';
+      }
+
+      function tryStartAudio() {
+        if (audioStarted) return;
+        try { audio.currentTime = 14; } catch (e) {}
+        const p = audio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(function () {
+            audioStarted = true;
+            audioNote.textContent = 'Reproduciendo desde el segundo 14.';
+            setPlayLabel();
+          }).catch(function () {
+            audioNote.textContent = 'En iPhone puede ser necesario tocar “Música” para iniciar el audio.';
+            setPlayLabel();
+          });
+        }
+      }
+
+      audio.addEventListener('loadedmetadata', function () {
+        try { audio.currentTime = 14; } catch (e) {}
+        tryStartAudio();
+      });
+
+      document.addEventListener('click', function () {
+        tryStartAudio();
+      }, { once: true });
+
+      document.addEventListener('touchstart', function () {
+        tryStartAudio();
+      }, { once: true });
+
+      playBtn.addEventListener('click', function () {
+        if (audio.paused || audio.ended) {
+          if ((audio.currentTime || 0) < 14) audio.currentTime = 14;
+          audio.play().then(function () {
+            audioStarted = true;
+            audioNote.textContent = 'Reproduciendo desde el segundo 14.';
+            setPlayLabel();
+          }).catch(function () {
+            audioNote.textContent = 'No se pudo iniciar el audio automáticamente.';
+            setPlayLabel();
+          });
+        } else {
+          audio.pause();
+          setPlayLabel();
+        }
+      });
+
+      muteBtn.addEventListener('click', function () {
+        audio.muted = !audio.muted;
+        setMuteLabel();
+      });
+
+      let currentData = render();
+      setInterval(function () { currentData = render(); }, 1000);
+
+      document.getElementById('refreshBtn').addEventListener('click', function () {
+        currentData = render();
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', function () {
+        const text = [
+          'Semana Santa ' + currentData.year,
+          'Domingo de Ramos: ' + esMedium.format(currentData.palmSunday),
+          'Jueves Santo: ' + esMedium.format(currentData.holyThursday),
+          'Viernes Santo: ' + esMedium.format(currentData.goodFriday),
+          'Domingo de Resurrección: ' + esMedium.format(currentData.easterSunday)
+        ].join('\n');
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            alert('Fechas copiadas.');
+          }).catch(function () {
+            alert(text);
+          });
+        } else {
+          alert(text);
+        }
+      });
+
+      setMuteLabel();
+      setPlayLabel();
+    })();
+  </script>
+</body>
+</html>
